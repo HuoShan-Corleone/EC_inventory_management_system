@@ -1,0 +1,2 @@
+# EC_inventory_management_system
+基于MVC模式用java实现了商品管理信息系统，后台连接Mysql数据库，前端实现了基本UI.
