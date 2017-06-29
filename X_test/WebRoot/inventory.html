@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Basic CRUD Application - jQuery EasyUI CRUD Demo</title>
+    <link rel="stylesheet" type="text/css" href="css/skins/default.css" />
+    <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/themes/default/easyui.css"> 
+    <link rel="stylesheet" type="text/css" href="css/themes/icon.css">
+    <script type="text/javascript" src="js/iframeTools.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="js/datagrid-detailview.js"></script>  
+    <script type="text/javascript" src="js/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="js/jquery.uploadify.min.js"></script>
+    <script type="text/javascript">
+		/* $(function(){
+			$("body").after("<script type='text/javascript'>$(function(){$('body').show();});<\/script>");
+			$("body").height($(window).height());
+			$("body").width($(window).width());
+			$(window).resize(function() {
+				$("body").height($(window).height());
+				$("body").width($(window).width());
+				$('#dg').datagrid('resize');
+			});
+		}); */
+	</script>
+</head>
+<body >
+    <table id="dg" title="Inventory" class="easyui-datagrid" fit="true"
+            url="inventory/getInventoy.do" width="auto" height="auto"
+            toolbar="#toolbar" pagination="true" fitColumns="true"
+            rownumbers="true" fitColumns="true" singleSelect="true">
+        <thead>
+            <tr>
+                <th field="id" width="50">id</th>
+                <th field="productID" width="50">ProductID</th>
+                <th field="sum" width="50">Sum</th>
+            </tr>
+        </thead>
+    </table>
+    <script type="text/javascript">
+        var url;
+        function newProduct(){
+            $('#dlg').dialog('open').dialog('setTitle','添加用户');
+            console.log("333")
+            $('#fm').form('clear');
+            url = 'product/addProduct.do';
+        }
+        
+        function editProduct(){
+            var row = $('#dg').datagrid('getSelected');
+            if (row){
+                $('#dlg_edit').dialog('open').dialog('setTitle','Edit User');
+                var id = row.id;
+                $("#id").text(id);
+                var name = row.name;
+                var type = row.type;
+                var description = row.description;
+                console.info("editUser--->id = " + id + ",name = " + name +
+                	", type = " + type + ",description "+ description);
+                $("#fm_edit").form('load',{	
+                	id:id,
+                	name:name,
+                	type:type,
+                	description:description
+                });
+            }
+        }
+        
+        function comfirmEditProduct(){
+        	var id = $("#id").text();
+        	//$.messager.progress();
+        	$("#fm_edit").form('submit',{
+        		url:"product/updateProduct.do?id=" + id,
+        		onSubmit:function(){
+        			var isValid = $("this").form('validate');
+        			/* if(!isValid){
+        				$.messager.progress('close');
+        			} */
+        			
+        			return isValid;
+        		},
+        		success:function(data){
+        			//$.messager.progress('close');
+        			console.log("reslut: " +data);
+                    if (data == "OK") {
+                        $.messager.show({
+                            title: 'Success',
+                            msg: '信息更新成功！'
+                        });
+                        $('#dlg_edit').dialog('close');        // close the dialog
+                        $('#dg').datagrid('reload');    // reload the user data
+                    }else{
+                        $.messager.show({
+                            title: 'Error',
+                            msg: '信息更新失败！'
+                        });
+                        $('#dlg_edit').dialog('close'); 
+                    }
+        		}
+        	});
+        }
+        
+        function saveProduct(){
+            $('#fm').form('submit',{
+                url: "product/addProduct.do",
+                onSubmit: function(){
+                    return $(this).form('validate');
+                    console.log("222")
+                },
+                success: function(result){
+                    //var result = eval('('+result+')');
+                    console.log("reslut: " +result);
+                    if (result == "OK") {
+                        $('#dlg').dialog('close');        // close the dialog
+                        $('#dg').datagrid('reload');    // reload the user data
+                    }else{
+                        $.messager.show({
+                            title: 'Error',
+                            msg: result.errorMsg
+                        });
+                        $('#dlg').dialog('close'); 
+                    }
+                }
+            });
+        }
+        
+        function destroyProduct(){
+            var row = $('#dg').datagrid('getSelected');
+            if (row){
+            	var index = $('#dg').datagrid('getRowIndex',row);
+            	console.log("rowIndex: " + index);
+                $.messager.confirm('Confirm','Are you sure you want to destroy this product?',function(r){
+                    if (r){
+                        $.post('product/deleteProduct.do',{id:row.id},function(result){
+                        	console.log("result: " + result);
+                        	if (result.success == true){
+                        		console.log("rowIndex: " + index);
+                        		$('#dg').datagrid('deleteRow',index);
+                                //$('#dg').datagrid('reload');    // reload the user data
+                            } else {
+                                $.messager.show({    // show error message
+                                    title: 'Error',
+                                    msg: result.errorMsg
+                                });
+                            }
+                        },'json');
+                    }
+                });
+            }
+        }
+    </script>
+    <style type="text/css">
+        #fm{
+            margin:0;
+            padding:10px 30px;
+        }
+        .ftitle{
+            font-size:14px;
+            font-weight:bold;
+            padding:5px 0;
+            margin-bottom:10px;
+            border-bottom:1px solid #ccc;
+        }
+        .fitem{
+            margin-bottom:5px;
+        }
+        .fitem label{
+            display:inline-block;
+            width:80px;
+        }
+    </style>
+</body>
+</html>

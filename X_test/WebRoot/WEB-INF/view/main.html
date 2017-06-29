@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>jQuery-EasyUI 1.1 instance</title>
+    <link href="../css/default.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../js/themes/default/easyui.css" />
+    <link rel="stylesheet" type="text/css" href="../js/themes/icon.css" />
+    <script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../js/jquery.easyui.js"></script>
+	<script type="text/javascript" src='../js/outlook2.js'> </script>
+    <script type="text/javascript">
+	 var _menus = {"menus":[
+	 					{"menuid":"8","icon":"icon-sys","menuname":"Employee management",
+							"menus":[{"menuid":"21","menuname":"Employee list","icon":"icon-nav","url":"../test2.html"}
+								]
+						},{"menuid":"39","icon":"icon-sys","menuname":"Mall management",
+							"menus":[{"menuid":"52","menuname":"List of goods","icon":"icon-nav","url":"../product.html"},
+									{"menuid":"53","menuname":"Merchandise order","icon":"icon-nav","url":"../cartItems.html"},
+									{"menuid":"54","menuname":"Merchandise inventory","icon":"icon-nav","url":"../inventory.html"}
+								]
+						}
+				]};
+        //设置登录窗口
+        function openPwd() {
+            $('#w').window({
+                title: 'password modify',
+                width: 300,
+                modal: true,
+                shadow: true,
+                closed: true,
+                height: 160,
+                resizable:false
+            });
+        }
+        //关闭登录窗口
+        function closePwd() {
+            $('#w').window('close');
+        }
+        //修改密码
+        function serverLogin() {
+            var $newpass = $('#txtNewPass');
+            var $rePass = $('#txtRePass');
+
+            if ($newpass.val() == '') {
+                msgShow('System hint', 'Input password, please', 'warning');
+                return false;
+            }
+            if ($rePass.val() == '') {
+                msgShow('System hint', 'Input again, please', 'warning');
+                return false;
+            }
+
+            if ($newpass.val() != $rePass.val()) {
+                msgShow('System hint', 'The two password is inconsitend, please try again', 'warning');
+                return false;
+            }
+
+            $.post('/ajax/editpassword.ashx?newpass=' + $newpass.val(), function(msg) {
+                msgShow('System hint', 'Congratulations,password modify success<br>Your new password：' + msg, 'info');
+                $newpass.val('');
+                $rePass.val('');
+                close();
+            })
+            
+        }
+
+        $(function() {
+
+            openPwd();
+
+            $('#editpass').click(function() {
+                $('#w').window('open');
+            });
+
+            $('#btnEp').click(function() {
+                serverLogin();
+            });
+
+			$('#btnCancel').click(function(){closePwd();});
+
+            $('#loginOut').click(function() {
+                $.messager.confirm('System hint', 'Are you sure you want to log out', function(r) {
+
+                    if (r) {
+                        location.href = '/ajax/loginout.ashx';
+                    }
+                });
+            });
+        });
+		
+		
+
+    </script>
+
+</head>
+<body class="easyui-layout" style="overflow-y: hidden"  scroll="no">
+<noscript>
+<div style=" position:absolute; z-index:100000; height:2046px;top:0px;left:0px; width:100%; background:white; text-align:center;">
+    <img src="images/noscript.gif" alt='Sorry,please open script support.' />
+</div></noscript>
+    <div region="north" split="true" border="false" style="overflow: hidden; height: 30px;
+        background: url(images/layout-browser-hd-bg.gif) #7f99be repeat-x center 50%;
+        line-height: 20px;color: #fff; font-family: Verdana, 微软雅黑,黑体">
+        <span style="float:right; padding-right:20px;" class="head">Welcome CanLiu<a href="#" id="editpass">password modify</a> <a href="#" id="loginOut">Safe exit</a></span>
+        <span style="padding-left:10px; font-size: 16px; "><img src="images/blocks.gif" width="20" height="20" align="absmiddle" /> management information system</span>
+    </div>
+    <div region="south" split="true" style="height: 30px; background: #D2E0F2; ">
+        <div class="footer">canliudeep@gmail.com</div>
+    </div>
+    <div region="west" split="true" title="List of Navigation" style="width:180px;" id="west">
+		<div class="easyui-accordion" fit="true" border="false">
+		<!--  Navigation content -->
+		</div>
+	</div>
+    <div id="mainPanle" region="center" style="background: #eee; overflow-y:hidden">
+        <div id="tabs" class="easyui-tabs"  fit="true" border="false" >
+			<div title="Welcome to use" style="padding:20px;overflow:hidden;" id="home">
+				
+			<h1>Welcome to using The jQuery EasyUI!</h1>
+
+			</div>
+		</div>
+    </div>
+    
+    
+    <!--修改密码窗口-->
+    <div id="w" class="easyui-window" title="modify password" collapsible="false" minimizable="false"
+        maximizable="false" icon="icon-save"  style="width: 300px; height: 150px; padding: 5px;
+        background: #fafafa;">
+        <div class="easyui-layout" fit="true">
+            <div region="center" border="false" style="padding: 10px; background: #fff; border: 1px solid #ccc;">
+                <table cellpadding=3>
+                    <tr>
+                        <td>new password：</td>
+                        <td><input id="txtNewPass" type="password" class="txt01" /></td>
+                    </tr>
+                    <tr>
+                        <td>confirm password：</td>
+                        <td><input id="txtRePass" type="password" class="txt01" /></td>
+                    </tr>
+                </table>
+            </div>
+            <div region="south" border="false" style="text-align: right; height: 30px; line-height: 30px;">
+                <a id="btnEp" class="easyui-linkbutton" icon="icon-ok" href="javascript:void(0)" >
+                    sure</a> <a id="btnCancel" class="easyui-linkbutton" icon="icon-cancel" href="javascript:void(0)">cancel</a>
+            </div>
+        </div>
+    </div>
+
+	<div id="mm" class="easyui-menu" style="width:150px;">
+		<div id="mm-tabclose">close</div>
+		<div id="mm-tabcloseall">close all</div>
+		<div id="mm-tabcloseother">In addition,all shut down</div>
+		<div class="menu-sep"></div>
+		<div id="mm-tabcloseright">The right side if the current page is all closed</div>
+		<div id="mm-tabcloseleft">The left side if the current page is all closed</div>
+		<div class="menu-sep"></div>
+		<div id="mm-exit">exit</div>
+	</div>
+
+
+</body>
+</html>

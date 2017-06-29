@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Basic CRUD Application - jQuery EasyUI CRUD Demo</title>
+    <link rel="stylesheet" type="text/css" href="css/skins/default.css" />
+    <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/themes/default/easyui.css"> 
+    <link rel="stylesheet" type="text/css" href="css/themes/icon.css">
+    <script type="text/javascript" src="js/iframeTools.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="js/datagrid-detailview.js"></script>  
+    <script type="text/javascript" src="js/easyui-lang-zh_CN.js"></script>
+    <script type="text/javascript" src="js/jquery.uploadify.min.js"></script>
+    <script type="text/javascript">
+		/* $(function(){
+			$("body").after("<script type='text/javascript'>$(function(){$('body').show();});<\/script>");
+			$("body").height($(window).height());
+			$("body").width($(window).width());
+			$(window).resize(function() {
+				$("body").height($(window).height());
+				$("body").width($(window).width());
+				$('#dg').datagrid('resize');
+			});
+		}); */
+	</script>
+</head>
+<body >
+    <table id="dg" title="My CartItems" class="easyui-datagrid" fit="true"
+            url="cartItems/getCartItems.do" width="auto" height="auto"
+            toolbar="#toolbar" pagination="true" fitColumns="true"
+            rownumbers="true" fitColumns="true" singleSelect="true">
+        <thead>
+            <tr>
+            	<th field="id" width="50">Id</th>
+                <th field="productID" width="50">ProductID</th>
+                <th field="record" width="50">Record</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="toolbar">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="entryStorage()">Entry Storage</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="exitStorage()">Exit Product</a>
+    </div>
+    
+    <div id="dlg" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
+            closed="true" buttons="#dlg-buttons">
+        <div class="ftitle">User Information</div>
+        <form id="fm" method="post" novalidate>
+            <div class="fitem">
+                <label>ProductName:</label>
+                <input name="productname" class="easyui-validatebox" required="true">
+            </div>
+            <div class="fitem">
+                <label>Record:</label>
+                <input name="record" class="easyui-validatebox" required="true">
+            </div>
+        </form>
+    </div>
+    <div id="dlg-buttons">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveAddRecord()">Save</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
+    </div>
+    
+    <div id="dlg_Sub" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"
+            closed="true" buttons="#dlg-buttons-edit">
+        <div class="ftitle">Product Information</div>
+        <form id="fm_sub" method="post" novalidate>
+        	<div class="fitem">
+                <label>ProductName:</label>
+                <input name="productname" class="easyui-validatebox" required="true">
+            </div>
+            <div class="fitem">
+                <label>Record:</label>
+                <input name="record" class="easyui-validatebox" required="true">
+            </div>
+        </form>
+    </div>
+    <div id="dlg-buttons-edit">
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveSubRecord()">Save</a>
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg_Sub').dialog('close')">Cancel</a>
+    </div>
+    <script type="text/javascript">
+        var url;
+        function entryStorage(){
+            $('#dlg').dialog('open').dialog('setTitle','添加用户');
+            console.log("333");
+            $('#fm').form('clear');
+            url = 'cartItems/purchaseItems.do';
+        }
+        
+        function exitStorage(){
+            $('#dlg_Sub').dialog('open').dialog('setTitle','添加用户');
+            console.log("333");
+            $('#fm_sub').form('clear');
+            url = 'cartItems/sellItems.do';
+        }
+        
+        function saveAddRecord(){
+            $('#fm').form('submit',{
+                url: "cartItems/purchaseItems.do",
+                onSubmit: function(){
+                    return $(this).form('validate');
+                    console.log("222")
+                },
+                success: function(result){
+                    //var result = eval('('+result+')');
+                    console.log("reslut: " +result);
+                    if (result == "OK") {
+                        $('#dlg').dialog('close');        // close the dialog
+                        $('#dg').datagrid('reload');    // reload the user data
+                    }else{
+                        $.messager.show({
+                            title: 'Error',
+                            msg: result.errorMsg
+                        });
+                        $('#dlg').dialog('close'); 
+                    }
+                }
+            });
+        }
+        
+       function saveSubRecord(){
+            $('#fm_sub').form('submit',{
+                url: "cartItems/sellItems.do",
+                onSubmit: function(){
+                    return $(this).form('validate');
+                    console.log("222")
+                },
+                success: function(result){
+                    //var result = eval('('+result+')');
+                    console.log("reslut: " +result);
+                    if (result == "OK") {
+                        $('#dlg_Sub').dialog('close');        // close the dialog
+                        $('#dg').datagrid('reload');    // reload the user data
+                    }else{
+                        $.messager.show({
+                            title: 'Error',
+                            msg: result.errorMsg
+                        });
+                        $('#dlg_Sub').dialog('close'); 
+                    }
+                }
+            });
+        }
+        
+    </script>
+    <style type="text/css">
+        #fm{
+            margin:0;
+            padding:10px 30px;
+        }
+        .ftitle{
+            font-size:14px;
+            font-weight:bold;
+            padding:5px 0;
+            margin-bottom:10px;
+            border-bottom:1px solid #ccc;
+        }
+        .fitem{
+            margin-bottom:5px;
+        }
+        .fitem label{
+            display:inline-block;
+            width:80px;
+        }
+    </style>
+</body>
+</html>
